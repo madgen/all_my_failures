@@ -1,0 +1,8 @@
+.autotest
+History.txt
+Manifest.txt
+README.md
+Rakefile
+bin/all_my_failures
+lib/all_my_failures.rb
+test/test_all_my_failures.rb

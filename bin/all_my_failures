@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require 'all_my_failures'
+
+INPUT_FILES = IO.readlines(ARGV[0]).map(&:chomp)
+COMMAND = ARGV[1]
+N_OF_THREADS = ARGV[2] ? ARGV[2].to_i : 1
+
+AllMyFailures.run INPUT_FILES, COMMAND, N_OF_THREADS
