@@ -5,4 +5,5 @@ README.md
 Rakefile
 bin/all_my_failures
 lib/all_my_failures.rb
+lib/all_my_failures/task.rb
 test/test_all_my_failures.rb

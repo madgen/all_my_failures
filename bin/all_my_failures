@@ -2,8 +2,17 @@
 
 require 'all_my_failures'
 
+usage = 'usage: all_my_failures <input_file> <command> \
+          <n_of_threads> <timeout>'.freeze
+
+if ARGV.size != 4
+  STDERR.puts usage
+  exit 1
+end
+
 INPUT_FILES = IO.readlines(ARGV[0]).map(&:chomp)
 COMMAND = ARGV[1]
-N_OF_THREADS = ARGV[2] ? ARGV[2].to_i : 1
+N_OF_THREADS = ARGV[2].to_i
+TIMEOUT = ARGV[3].to_i
 
-AllMyFailures.run INPUT_FILES, COMMAND, N_OF_THREADS
+AllMyFailures.run INPUT_FILES, COMMAND, N_OF_THREADS, TIMEOUT
