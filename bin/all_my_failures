@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'all_my_failures'
+require 'all_my_failures/session'
 
 usage = 'usage: all_my_failures <input_file> <command> \
           [<n_of_threads>] [<timeout>]'
@@ -16,4 +17,6 @@ COMMAND = ARGV[1]
 N_OF_THREADS = ARGV[2]&.to_i
 TIMEOUT = ARGV[3]&.to_i
 
-AllMyFailures.run INPUT_FILES, COMMAND, N_OF_THREADS, TIMEOUT
+session = Session.new INPUT_FILES, COMMAND, N_OF_THREADS, TIMEOUT
+
+AllMyFailures.run session

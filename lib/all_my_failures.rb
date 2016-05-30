@@ -6,8 +6,7 @@ require 'parallel'
 class AllMyFailures
   VERSION = '0.0.1'
 
-  def self.run(input_files, command, n_of_threads, timeout)
-    session = Session.new command, input_files, n_of_threads, timeout
+  def self.run(session)
     session.run
     puts
     puts session

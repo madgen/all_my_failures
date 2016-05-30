@@ -7,7 +7,7 @@ class Session
   DEFAULT_N_OF_THREADS = Parallel.processor_count
   DEFAULT_TIMEOUT = 60
 
-  def initialize(command, input_files, n_of_threads, timeout)
+  def initialize(input_files, command, n_of_threads, timeout)
     @tasks = Task.generate command, input_files
     @n_of_threads = n_of_threads || DEFAULT_N_OF_THREADS
     @timeout = timeout || DEFAULT_TIMEOUT
