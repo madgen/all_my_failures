@@ -29,10 +29,6 @@ class Task
     @status = :timeout
   end
 
-  def cancel
-    kill @pid if @pid
-  end
-
   def self.generate(prototype, targets)
     targets.map do |target|
       Task.new target, prototype.gsub(PLACEHOLDER, target)
