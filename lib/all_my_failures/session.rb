@@ -12,7 +12,7 @@ class Session
     @n_of_threads = n_of_threads || DEFAULT_N_OF_THREADS
     @timeout = timeout || DEFAULT_TIMEOUT
     @status_counts = {
-      prerun: @tasks.size,
+      to_run: @tasks.size,
       success: 0,
       failure: 0,
       timeout: 0,
@@ -21,7 +21,7 @@ class Session
 
   def note_result(status)
     @status_counts[status] += 1
-    @status_counts[:prerun] -= 1
+    @status_counts[:to_run] -= 1
   end
 
   def run
