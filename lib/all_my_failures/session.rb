@@ -1,10 +1,16 @@
+# frozen_string_literal: true
+
 require 'all_my_failures/task'
+require 'parallel'
 
 class Session
+  DEFAULT_N_OF_THREADS = Parallel.processor_count
+  DEFAULT_TIMEOUT = 60
+
   def initialize(command, input_files, n_of_threads, timeout)
     @tasks = Task.generate command, input_files
-    @n_of_threads = n_of_threads
-    @timeout = timeout
+    @n_of_threads = n_of_threads || DEFAULT_N_OF_THREADS
+    @timeout = timeout || DEFAULT_TIMEOUT
     @status_counts = {
       prerun: @tasks.size,
       success: 0,
@@ -42,7 +48,7 @@ class Session
       when :timeout
         print  'T'
       else
-        raise 'Unexpected process status. Must not happen.'.freeze
+        raise 'Unexpected process status. Must not happen.'
       end
 
       note_result task.status
@@ -59,7 +65,7 @@ class Session
   def to_s
     n_of_tasks = @status_counts.inject(0) { |a, e| a + e[1] }
 
-    StringIO.open '' do |str|
+    StringIO.open do |str|
       str.puts 'Statistics'
       str.puts '-' * 80
       str.print 'targets:'.rjust(10), "\t", n_of_tasks, "\n"
@@ -76,9 +82,9 @@ class Session
   private
 
   def print_failures
-    StringIO.open '' do |str|
+    StringIO.open do |str|
       str.puts
-      str.puts 'Failures & Timeouts:'.freeze
+      str.puts 'Failures & Timeouts:'
       str.puts '-' * 80
       @tasks.each do |task|
         str.puts task.target if [:failure, :timeout].include? task.status

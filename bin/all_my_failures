@@ -1,18 +1,19 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'all_my_failures'
 
 usage = 'usage: all_my_failures <input_file> <command> \
-          <n_of_threads> <timeout>'.freeze
+          [<n_of_threads>] [<timeout>]'
 
-if ARGV.size != 4
+if ARGV.size < 2
   STDERR.puts usage
   exit 1
 end
 
 INPUT_FILES = IO.readlines(ARGV[0]).map(&:chomp)
 COMMAND = ARGV[1]
-N_OF_THREADS = ARGV[2].to_i
-TIMEOUT = ARGV[3].to_i
+N_OF_THREADS = ARGV[2]&.to_i
+TIMEOUT = ARGV[3]&.to_i
 
 AllMyFailures.run INPUT_FILES, COMMAND, N_OF_THREADS, TIMEOUT

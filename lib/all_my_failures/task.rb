@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'timeout'
 require 'English'
 
 class Task
-  PLACEHOLDER = 'FILE'.freeze
+  PLACEHOLDER = 'FILE'
   SYSTEM_OPTIONS = { out: File::NULL, err: File::NULL }.freeze
 
   attr_reader :status, :command, :target
