@@ -27,6 +27,10 @@ class Session
       end
     end
 
+    Signal.trap 'INT' do
+      raise Parallel::Kill
+    end
+
     Parallel.each(@tasks, in_threads: @n_of_threads) do |task|
       task.run @timeout
 
@@ -44,7 +48,12 @@ class Session
       note_result task.status
     end
 
+  rescue Parallel::Kill
+    # do nothing
+  ensure
     puts
+
+    Signal.trap 'INT', 'DEFAULT'
   end
 
   def to_s
