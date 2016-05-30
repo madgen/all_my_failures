@@ -19,6 +19,14 @@ class Session
   end
 
   def run
+    # Thread for displaying progress
+    Thread.new do
+      loop do
+        STDIN.gets
+        puts print_failures
+      end
+    end
+
     Parallel.each(@tasks, in_threads: @n_of_threads) do |task|
       task.run @timeout
 
@@ -35,6 +43,7 @@ class Session
 
       note_result task.status
     end
+
     puts
   end
 
@@ -49,7 +58,7 @@ class Session
         str.print "#{k}:".rjust(10), "\t", v, "\n"
       end
 
-      record_failure str if @status_counts[:success] != n_of_tasks
+      str.print print_failures if @status_counts[:success] != n_of_tasks
 
       str.string
     end
@@ -57,12 +66,15 @@ class Session
 
   private
 
-  def record_failure(str)
-    str.puts
-    str.puts 'Failures & Timeouts:'.freeze
-    str.puts '-' * 80
-    @tasks.each do |task|
-      str.puts task.target if [:failure, :timeout].include? task.status
+  def print_failures
+    StringIO.open '' do |str|
+      str.puts
+      str.puts 'Failures & Timeouts:'.freeze
+      str.puts '-' * 80
+      @tasks.each do |task|
+        str.puts task.target if [:failure, :timeout].include? task.status
+      end
+      str.string
     end
   end
 end
