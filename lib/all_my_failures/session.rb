@@ -4,13 +4,10 @@ require 'all_my_failures/task'
 require 'parallel'
 
 class Session
-  DEFAULT_N_OF_THREADS = Parallel.processor_count
-  DEFAULT_TIMEOUT = 60
-
-  def initialize(input_files, command, n_of_threads, timeout)
+  def initialize(input_files, command, options)
     @tasks = Task.generate command, input_files
-    @n_of_threads = n_of_threads || DEFAULT_N_OF_THREADS
-    @timeout = timeout || DEFAULT_TIMEOUT
+    @n_of_threads = options[:n_of_threads]
+    @timeout = options[:timeout]
     @status_counts = {
       to_run: @tasks.size,
       success: 0,
