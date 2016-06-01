@@ -4,10 +4,16 @@ require 'all_my_failures/task'
 require 'parallel'
 
 class Session
-  def initialize(input_files, command, options)
+  DEFAULT_TIMEOUT = 60
+  DEFAULT_THREAD_COUNT = Parallel.processor_count
+
+  def initialize(input_files,
+                 command,
+                 n_of_threads: DEFAULT_THREAD_COUNT,
+                 timeout: DEFAULT_TIMEOUT)
     @tasks = Task.generate command, input_files
-    @n_of_threads = options[:n_of_threads]
-    @timeout = options[:timeout]
+    @n_of_threads = n_of_threads
+    @timeout = timeout
     @status_counts = {
       to_run: @tasks.size,
       success: 0,
@@ -76,6 +82,12 @@ class Session
     end
   end
 
+  def failures
+    @tasks.lazy.map do |task|
+      task.target if [:failure, :timeout].include? task.status
+    end.select { |e| e }.to_a
+  end
+
   private
 
   def print_failures
@@ -83,9 +95,7 @@ class Session
       str.puts
       str.puts 'Failures & Timeouts:'
       str.puts '-' * 80
-      @tasks.each do |task|
-        str.puts task.target if [:failure, :timeout].include? task.status
-      end
+      str.puts failures
       str.string
     end
   end

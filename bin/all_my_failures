@@ -5,12 +5,10 @@ require 'all_my_failures'
 require 'all_my_failures/session'
 
 require 'optparse'
-require 'parallel'
 
-options = {
-  n_of_threads: Parallel.processor_count,
-  timeout: 60, # Default timeout duration in seconds
-}
+session_options = { }
+program_options = { }
+
 option_parser = OptionParser.new do |opts|
   opts.banner = "usage: #{AllMyFailures::PROGRAM_NAME} <input_file> <command>"
   opts.separator ''
@@ -20,14 +18,18 @@ option_parser = OptionParser.new do |opts|
           '--threads THREAD_COUNT',
           Integer,
           'Number of cores used (default: all)') do |n|
-    options[:n_of_threads] = n
+    session_options[:n_of_threads] = n
   end
 
   opts.on('-t',
           '--timeout SECS',
           Integer,
           'Timeout threshold (default: 60s)') do |t|
-    options[:timeout] = t
+    session_options[:timeout] = t
+  end
+
+  opts.on('-o', '--output FILE', String, 'File to output failing files') do |f|
+    program_options[:failure_output] = f
   end
 
   opts.on('-h', '--help', 'Display this message') do
@@ -46,6 +48,6 @@ end
 INPUT_FILES = IO.readlines(ARGV[0]).map(&:chomp)
 COMMAND = ARGV[1]
 
-session = Session.new INPUT_FILES, COMMAND, options
+session = Session.new INPUT_FILES, COMMAND, session_options
 
-AllMyFailures.run session
+AllMyFailures.run session, program_options
