@@ -4,7 +4,7 @@ require 'all_my_failures/task'
 require 'parallel'
 
 class Session
-  DEFAULT_TIMEOUT = 60
+  DEFAULT_TIMEOUT = :infinite
   DEFAULT_THREAD_COUNT = Parallel.processor_count
 
   def initialize(input_files,

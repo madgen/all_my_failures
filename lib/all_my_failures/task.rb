@@ -17,9 +17,15 @@ class Task
   end
 
   def run(timeout)
-    Timeout.timeout(timeout) do
+    runnable = lambda do
       @pid = spawn @command, SYSTEM_OPTIONS
       Process.wait @pid
+    end
+
+    if timeout == :infinite
+      runnable.call
+    else
+      Timeout.timeout(timeout) { runnable.call }
     end
 
     @status = $CHILD_STATUS.success? ? :success : :failure
