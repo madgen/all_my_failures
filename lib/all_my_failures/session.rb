@@ -10,10 +10,12 @@ class Session
   def initialize(input_files,
                  command,
                  n_of_threads: DEFAULT_THREAD_COUNT,
-                 timeout: DEFAULT_TIMEOUT)
+                 timeout: DEFAULT_TIMEOUT,
+                 suppress_failure: false)
     @tasks = Task.generate command, input_files
     @n_of_threads = n_of_threads
     @timeout = timeout
+    @suppress_failure = suppress_failure
     @status_counts = {
       to_run: @tasks.size,
       success: 0,
@@ -77,7 +79,9 @@ class Session
       end
 
       non_mistakes = @status_counts[:success] + @status_counts[:to_run]
-      str.print print_failures if non_mistakes != n_of_tasks
+      if non_mistakes != n_of_tasks && @suppress_failure
+        str.print print_failures
+      end
 
       str.string
     end

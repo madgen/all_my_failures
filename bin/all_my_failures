@@ -32,6 +32,10 @@ option_parser = OptionParser.new do |opts|
     program_options[:failure_output] = f
   end
 
+  opts.on('-s', '--suppress', 'Suppress failures at the end of run') do
+    session_options[:suppress_failure] = true
+  end
+
   opts.on('-h', '--help', 'Display this message') do
     puts opts
     exit
