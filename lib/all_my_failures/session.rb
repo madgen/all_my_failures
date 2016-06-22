@@ -76,7 +76,8 @@ class Session
         str.print "#{k}:".rjust(10), "\t", v, "\n"
       end
 
-      str.print print_failures if @status_counts[:success] != n_of_tasks
+      non_mistakes = @status_counts[:success] + @status_counts[:to_run]
+      str.print print_failures if non_mistakes != n_of_tasks
 
       str.string
     end
