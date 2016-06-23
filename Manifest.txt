@@ -5,6 +5,7 @@ README.md
 Rakefile
 bin/all_my_failures
 lib/all_my_failures.rb
+lib/all_my_failures/coloured_string.rb
 lib/all_my_failures/task.rb
 lib/all_my_failures/session.rb
 test/test_all_my_failures.rb

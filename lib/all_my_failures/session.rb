@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 require 'all_my_failures/task'
+require 'all_my_failures/coloured_string'
 require 'parallel'
 
 class Session
+  using ColouredString
+
   DEFAULT_TIMEOUT = :infinite
   DEFAULT_THREAD_COUNT = Parallel.processor_count
 
@@ -47,11 +50,11 @@ class Session
 
       case task.status
       when :success
-        print  '.'
+        print  '.'.green
       when :failure
-        print  'F'
+        print  'F'.red
       when :timeout
-        print  'T'
+        print  'T'.light_blue
       else
         raise 'Unexpected process status. Must not happen.'
       end
@@ -87,6 +90,16 @@ class Session
     end
   end
 
+  def coloured_failrues
+    @tasks.lazy.map do |task|
+      if task.status == :failure
+        task.target.red
+      elsif task.status == :timeout
+        task.target.light_blue
+      end
+    end.select { |e| e }.to_a
+  end
+
   def failures
     @tasks.lazy.map do |task|
       task.target if [:failure, :timeout].include? task.status
@@ -100,7 +113,7 @@ class Session
       str.puts
       str.puts 'Failures & Timeouts:'
       str.puts '-' * 80
-      str.puts failures
+      str.puts coloured_failrues
       str.string
     end
   end
