@@ -82,7 +82,7 @@ class Session
       end
 
       non_mistakes = @status_counts[:success] + @status_counts[:to_run]
-      if non_mistakes != n_of_tasks && @suppress_failure
+      if non_mistakes != n_of_tasks && !@suppress_failure
         str.print print_failures
       end
 
