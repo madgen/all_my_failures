@@ -106,6 +106,12 @@ class Session
     end.select { |e| e }.to_a
   end
 
+  def successes
+    @tasks.lazy.map do |task|
+      [task.target, task.output] if task.status == :success
+    end.select { |_, out| out && out != '' }.to_a
+  end
+
   private
 
   def print_failures

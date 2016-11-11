@@ -7,10 +7,16 @@ class AllMyFailures
   PROGRAM_NAME = 'all_my_failures'
   VERSION = '0.0.1'
 
-  def self.run(session, failure_output: nil)
+  def self.run(session, failure_output: nil, success_output: nil)
     session.run
     puts
     puts session
+
+    if success_output
+      File.open success_output, 'w' do |f|
+        f.puts session.successes
+      end
+    end
 
     if failure_output
       File.open failure_output, 'w' do |f|

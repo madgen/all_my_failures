@@ -2,14 +2,15 @@
 
 require 'timeout'
 require 'English'
+require 'tempfile'
 
 class Task
   PLACEHOLDER = 'FILE'
-  SYSTEM_OPTIONS = { out: File::NULL, err: File::NULL }.freeze
 
-  attr_reader :status, :command, :target
+  attr_reader :status, :command, :target, :output
 
   def initialize(target, command)
+    @system_options = { out: Tempfile.new, err: File::NULL }.freeze
     @command = command
     @target = target
     @status = :prerun
@@ -18,7 +19,7 @@ class Task
 
   def run(timeout)
     runnable = lambda do
-      @pid = spawn @command, SYSTEM_OPTIONS
+      @pid = spawn @command, @system_options
       Process.wait @pid
     end
 
@@ -33,6 +34,13 @@ class Task
     kill @pid
 
     @status = :timeout
+  ensure
+    tmp = @system_options[:out]
+    if @status == :success
+      tmp.rewind
+      @output = tmp.read
+    end
+    tmp.close
   end
 
   def self.generate(prototype, targets)
