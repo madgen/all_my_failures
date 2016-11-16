@@ -3,6 +3,7 @@
 require 'all_my_failures/session'
 require 'parallel'
 
+# Entry point to the dispatcher
 class AllMyFailures
   PROGRAM_NAME = 'all_my_failures'
   VERSION = '0.0.1'
