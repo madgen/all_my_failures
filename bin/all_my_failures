@@ -6,8 +6,8 @@ require 'all_my_failures/session'
 
 require 'optparse'
 
-session_options = { }
-program_options = { }
+session_options = {}
+program_options = {}
 
 option_parser = OptionParser.new do |opts|
   opts.banner = "usage: #{AllMyFailures::PROGRAM_NAME} <input_file> <command>"
