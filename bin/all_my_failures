@@ -5,6 +5,7 @@ require 'all_my_failures'
 require 'all_my_failures/session'
 
 require 'optparse'
+require 'find'
 
 session_options = {}
 program_options = {}
@@ -13,6 +14,13 @@ option_parser = OptionParser.new do |opts|
   opts.banner = "usage: #{AllMyFailures::PROGRAM_NAME} <input_file> <command>"
   opts.separator ''
   opts.separator 'Specific options:'
+
+  opts.on('-r',
+          '--regexp REGEXP',
+          Regexp,
+          'Regular exp. to filter files instead of giving a file list') do |r|
+    program_options[:file_regexp] = r
+  end
 
   opts.on('-n',
           '--threads THREAD_COUNT',
@@ -48,12 +56,30 @@ end
 
 option_parser.parse!(ARGV)
 
-if ARGV.size != 2
+unless (program_options[:file_regexp] && [1, 2].include?(ARGV.size)) ||
+       ARGV.size == 2
   STDERR.puts option_parser.banner
   exit 1
 end
 
-INPUT_FILES = IO.readlines(ARGV[0]).map(&:chomp)
+INPUT_FILES =
+  if program_options[:file_regexp]
+    ARGV.unshift Dir.pwd if ARGV.size == 1
+
+    input_files = []
+    Find.find(ARGV[0]) do |path|
+      # Ignore the GIT directory.
+      Find.prune if File.directory?(path) && path == '.git'
+
+      input_files << path if path =~ program_options[:file_regexp]
+    end
+
+    input_files.freeze
+  else
+    IO.readlines(ARGV[0]).map(&:chomp).freeze
+  end
+program_options.delete(:file_regexp)
+
 COMMAND = ARGV[1]
 
 session = Session.new INPUT_FILES, COMMAND, session_options
