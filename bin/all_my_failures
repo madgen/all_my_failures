@@ -8,7 +8,7 @@ require 'optparse'
 require 'find'
 
 session_options = {}
-program_options = {}
+program_options = { keep: {} }
 
 option_parser = OptionParser.new do |opts|
   opts.banner = "usage: #{AllMyFailures::PROGRAM_NAME} <input_file> <command>"
@@ -36,16 +36,15 @@ option_parser = OptionParser.new do |opts|
     session_options[:timeout] = t
   end
 
-  opts.on('-o', '--output FILE', String, 'File to output failing files') do |f|
-    program_options[:failure_output] = f
-  end
-
-  opts.on('k', '--keep FILE', String, 'File to keep successful outputs') do |f|
-    program_options[:success_output] = f
-  end
-
-  opts.on('-s', '--suppress', 'Suppress failures at the end of run') do
-    session_options[:suppress_failure] = true
+  [:success, :failure].each do |outcome|
+    [:output, :target].each do |data_type|
+      opts.on("--keep-#{outcome}-#{data_type}s FILE",
+              String,
+              "File to keep #{outcome} #{data_type}s") do |f|
+        program_options[:keep][outcome] ||= {}
+        program_options[:keep][outcome][data_type] = f
+      end
+    end
   end
 
   opts.on('-h', '--help', 'Display this message') do

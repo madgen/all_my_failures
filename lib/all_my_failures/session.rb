@@ -102,14 +102,14 @@ class Session
 
   def failures
     @tasks.lazy.map do |task|
-      task.target if [:failure, :timeout].include? task.status
-    end.select { |e| e }.to_a
+      task if [:failure, :timeout].include? task.status
+    end.select { |e| e }
   end
 
   def successes
     @tasks.lazy.map do |task|
-      [task.target, task.output] if task.status == :success
-    end.select { |_, out| out && out != '' }.to_a
+      task if task.status == :success
+    end.select { |e| e }
   end
 
   private

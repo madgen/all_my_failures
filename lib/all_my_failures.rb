@@ -9,26 +9,37 @@ class AllMyFailures
   VERSION = '0.0.1'
   TERMINAL_WIDTH_R = /^\d\d (?<cols>\d\d)$/
 
-  def self.run(session, failure_output: nil, success_output: nil)
+  def self.run(session, keep:)
     print header
     session.run
     puts
     puts session
 
-    if success_output
-      File.open success_output, 'w' do |f|
-        f.puts session.successes
-      end
-    end
+    record session, keep
+  end
 
-    if failure_output
-      File.open failure_output, 'w' do |f|
-        f.puts session.failures
+  private_class_method
+  def self.record(session, keep)
+    [[:success, :successes],
+     [:failure, :failures]].each do |outcome_sym, method|
+      outcome = keep[outcome_sym]
+      # Skip if success/failure needs to be kept
+      next unless outcome
+
+      # Collect successes/failures
+      outcomes = session.send(method)
+
+      [:target, :output].each do |data_type_sym|
+        # If target doesn't need to be printed, skip.
+        next unless outcome[data_type_sym]
+
+        File.open(outcome[data_type_sym], 'w') do |f|
+          f.puts outcomes.map(&data_type_sym).to_a
+        end
       end
     end
   end
 
-  private_class_method
   def self.header
     # Attempt to retrieve column width using stty UNIX utility
     n_of_cols = TERMINAL_WIDTH_R.match(`stty size`)&.[](:cols)&.to_i
