@@ -13,12 +13,10 @@ class Session
   def initialize(input_files,
                  command,
                  n_of_threads: DEFAULT_THREAD_COUNT,
-                 timeout: DEFAULT_TIMEOUT,
-                 suppress_failure: false)
+                 timeout: DEFAULT_TIMEOUT)
     @tasks = Task.generate command, input_files
     @n_of_threads = n_of_threads
     @timeout = timeout
-    @suppress_failure = suppress_failure
     @status_counts = {
       to_run: @tasks.size,
       success: 0,
@@ -33,14 +31,6 @@ class Session
   end
 
   def run
-    # Thread for displaying progress
-    Thread.new do
-      loop do
-        STDIN.gets
-        puts print_failures
-      end
-    end
-
     Signal.trap 'INT' do
       raise Parallel::Kill
     end
@@ -81,23 +71,8 @@ class Session
         str.print "#{k}:".rjust(10), "\t", v, "\n"
       end
 
-      non_mistakes = @status_counts[:success] + @status_counts[:to_run]
-      if non_mistakes != n_of_tasks && !@suppress_failure
-        str.print print_failures
-      end
-
       str.string
     end
-  end
-
-  def coloured_failrues
-    @tasks.lazy.map do |task|
-      if task.status == :failure
-        task.target.red
-      elsif task.status == :timeout
-        task.target.light_blue
-      end
-    end.select { |e| e }.to_a
   end
 
   def failures
@@ -110,17 +85,5 @@ class Session
     @tasks.lazy.map do |task|
       task if task.status == :success
     end.select { |e| e }
-  end
-
-  private
-
-  def print_failures
-    StringIO.open do |str|
-      str.puts
-      str.puts 'Failures & Timeouts:'
-      str.puts '-' * 80
-      str.puts coloured_failrues
-      str.string
-    end
   end
 end
