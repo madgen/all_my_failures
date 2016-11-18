@@ -69,7 +69,7 @@ INPUT_FILES =
     input_files = []
     Find.find(ARGV[0]) do |path|
       # Ignore the GIT directory.
-      Find.prune if File.directory?(path) && path == '.git'
+      Find.prune if File.directory?(path) && File.basename(path) == '.git'
 
       input_files << path if path =~ program_options[:file_regexp]
     end
