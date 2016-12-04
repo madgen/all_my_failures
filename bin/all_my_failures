@@ -54,7 +54,12 @@ option_parser = OptionParser.new do |opts|
   end
 end
 
-option_parser.parse!(ARGV)
+begin
+  option_parser.parse!(ARGV)
+rescue OptionParser::InvalidOption
+  puts option_parser
+  exit 1
+end
 
 unless (program_options[:file_regexp] && [1, 2].include?(ARGV.size)) ||
        ARGV.size == 2
