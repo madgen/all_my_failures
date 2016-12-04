@@ -63,7 +63,7 @@ end
 
 unless (program_options[:file_regexp] && [1, 2].include?(ARGV.size)) ||
        ARGV.size == 2
-  STDERR.puts option_parser.banner
+  STDERR.puts option_parser
   exit 1
 end
 
