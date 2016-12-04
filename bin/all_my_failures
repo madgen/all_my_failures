@@ -6,6 +6,7 @@ require 'all_my_failures/session'
 
 require 'optparse'
 require 'find'
+require 'English'
 
 session_options = {}
 program_options = { keep: {} }
@@ -63,10 +64,19 @@ end
 
 INPUT_FILES =
   if program_options[:file_regexp]
-    ARGV.unshift Dir.pwd if ARGV.size == 1
+    input_list_path = ARGV.size == 2 ? ARGV[0] : Dir.pwd
+
+    if !File.exist? input_list_path
+      STDERR.puts "Base for file search at '#{input_list_path}' doesn't exist."
+      exit 1
+    elsif !File.directory? input_list_path
+      STDERR.puts "Base for file search at '#{input_list_path}' is not a"\
+        'directory.'
+      exit 1
+    end
 
     input_files = []
-    Find.find(ARGV[0]) do |path|
+    Find.find(input_list_path) do |path|
       # Ignore the GIT directory.
       Find.prune if File.directory?(path) && File.basename(path) == '.git'
 
@@ -75,11 +85,20 @@ INPUT_FILES =
 
     input_files.freeze
   else
-    IO.readlines(ARGV[0]).map(&:chomp).freeze
+    input_list_path = ARGV[0]
+    if !File.exist? input_list_path
+      STDERR.puts "Input list at '#{input_list_path}' doesn't exist."
+      exit 1
+    elsif !File.file? input_list_path
+      STDERR.puts "Input list at '#{input_list_path}' is not a file."
+      exit 1
+    end
+
+    IO.readlines(input_list_path).map(&:chomp).freeze
   end
 program_options.delete(:file_regexp)
 
-COMMAND = ARGV[1]
+COMMAND = ARGV.last
 
 session = Session.new INPUT_FILES, COMMAND, session_options
 
